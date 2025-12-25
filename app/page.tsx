@@ -83,7 +83,7 @@ export default function Home() {
   const winRate = totalPossibleWins > 0 ? Math.round((monthlyCompletions / totalPossibleWins) * 100) : 0;
 
   return (
-    <main className="min-h-screen p-4 sm:p-8 max-w-7xl mx-auto">
+    <main className="min-h-screen p-4 sm:p-8 max-w-7xl mx-auto pb-32">
       <Navbar user={user} />
 
       {/* Hero Stats */}
@@ -245,9 +245,15 @@ export default function Home() {
               >
                   <input 
                       name="taskInput"
-                      placeholder="+ Add a new task..." 
-                      className="flex-1 bg-transparent border-b-2 border-stone-200 focus:border-stone-400 outline-none p-2 font-bold text-stone-600 placeholder-stone-300"
+                      placeholder="Add task..." 
+                      className="flex-1 bg-white/50 border-2 border-stone-200 rounded-xl focus:border-stone-400 focus:bg-white outline-none p-3 font-bold text-stone-600 placeholder-stone-300 transition-colors"
                   />
+                  <button 
+                    type="submit"
+                    className="bg-stone-800 text-white w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl shadow-lg active:scale-95 transition-transform"
+                  >
+                    +
+                  </button>
               </form>
           </div>
       </div>

@@ -112,7 +112,27 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         // Check if user already marked today
         const userAlreadyCompleted = habit.dailyProgress.completedBy.some((id: any) => id.toString() === user.userId);
         
-        if (!userAlreadyCompleted) {
+        if (userAlreadyCompleted) {
+            // UNMARK / UNDO
+            habit.dailyProgress.completedBy = habit.dailyProgress.completedBy.filter((id: any) => id.toString() !== user.userId);
+            
+            // Check if this habit WAS completed today by everyone, and now it isn't
+            // Logic: If completedDates includes today, remove it and decrement streak
+            // Note: completedDates are Dates or Strings. Comparison needed.
+            const todayStr = new Date().toDateString();
+            const wasOfficialComplete = habit.completedDates.some((d: any) => new Date(d).toDateString() === todayStr);
+
+            if (wasOfficialComplete) {
+                // Remove today from completedDates
+                habit.completedDates = habit.completedDates.filter((d: any) => new Date(d).toDateString() !== todayStr);
+                habit.streak = Math.max(0, habit.streak - 1);
+            }
+
+            await habit.save();
+            await User.findByIdAndUpdate(user.userId, { $inc: { wins: -1 } });
+             console.log(`[Undo] User: ${user.userId} undid completion.`);
+        } else {
+            // MARK COMPLETE
             habit.dailyProgress.completedBy.push(user.userId);
             
             // Calculate total members (Owner + SharedWith)
