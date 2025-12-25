@@ -74,8 +74,8 @@ export default function HabitCard({ habit, onUpdate, currentUser }: { habit: any
         <button onClick={deleteHabit} className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-red-500 hover:text-red-600 bg-red-50 px-2 py-0.5 rounded">Delete</button>
       </div>
 
-      <div>
-        <Link href={`/habit/${habit._id}`} className="block group-hover:text-primary transition-colors">
+      <div className="relative z-10">
+        <Link href={`/habit/${habit._id}`} className="block group-hover:text-primary transition-colors w-fit">
             <h3 className="text-xl font-bold mb-2 text-slate-800">{habit.title} →</h3>
         </Link>
         <p className="text-muted text-sm mb-4 line-clamp-2">{habit.description || 'No description'}</p>
