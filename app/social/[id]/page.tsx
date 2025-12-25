@@ -59,18 +59,45 @@ export default function UserProfile({ params }: { params: Promise<{ id: string }
             </div>
         </div>
 
-        <h2 className="text-xl font-bold mb-4 px-2">Their Habits</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {habits.map((habit: any) => (
-                <div key={habit._id} className="glass-panel p-6 opacity-80 hover:opacity-100 transition-opacity">
-                    <h3 className="font-bold text-lg mb-2">{habit.title}</h3>
-                    <p className="text-sm text-muted mb-4">{habit.description}</p>
-                    <div className="flex justify-between items-center text-xs font-mono">
-                         <span>Streak: <span className="text-orange-400">{habit.streak}</span></span>
-                    </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            {/* Daily Plan Column */}
+            <div className="glass-panel p-6 border-stone-100 bg-stone-50/50 md:col-span-1">
+                <h2 className="text-lg font-black text-stone-800 mb-4">📝 Daily Plan</h2>
+                <div className="space-y-3">
+                    {profile.dailyPlan && profile.dailyPlan.length > 0 ? (
+                        profile.dailyPlan.map((task: any) => (
+                            <div key={task._id} className="flex items-center gap-3 opacity-90">
+                                <div className={`w-4 h-4 rounded-md border-2 flex items-center justify-center ${task.completed ? 'bg-green-500 border-green-500' : 'border-stone-300'}`}>
+                                    {task.completed && <span className="text-white text-[8px]">✓</span>}
+                                </div>
+                                <span className={`font-bold text-sm ${task.completed ? 'text-stone-300 line-through' : 'text-stone-600'}`}>
+                                    {task.text}
+                                </span>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-stone-400 text-sm italic">Sleeping... 💤</p>
+                    )}
                 </div>
-            ))}
-            {habits.length === 0 && <p className="text-muted p-4">This user hasn't shared any habits publicly yet.</p>}
+            </div>
+
+            {/* Habits Grid */}
+            <div className="md:col-span-2">
+                 <h2 className="text-xl font-bold mb-4 px-2">Their Habits</h2>
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {habits.map((habit: any) => (
+                        <div key={habit._id} className="glass-panel p-6 opacity-80 hover:opacity-100 transition-opacity">
+                            <h3 className="font-bold text-lg mb-2 text-stone-800">{habit.title}</h3>
+                            <p className="text-sm text-stone-500 mb-4 line-clamp-2">{habit.description || 'No description'}</p>
+                            <div className="flex justify-between items-center text-xs font-bold font-mono">
+                                <span>Streak: <span className="text-orange-500">{habit.streak} 🔥</span></span>
+                            </div>
+                        </div>
+                    ))}
+                    {habits.length === 0 && <p className="text-stone-400 p-4">No public habits.</p>}
+                </div>
+            </div>
         </div>
       </div>
     </main>

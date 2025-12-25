@@ -176,6 +176,81 @@ export default function Home() {
             })()}
         </div>
       </div>
+      
+      {/* Daily Plan Widget */}
+      <div className="glass-panel p-8 mb-12 border-stone-100 bg-stone-50/50 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-100 rounded-full blur-3xl opacity-50 -mr-10 -mt-10"></div>
+          
+          <h2 className="text-2xl font-black text-stone-800 mb-6 flex items-center gap-2 relative z-10">
+              📝 Today's Plan
+          </h2>
+
+          <div className="flex flex-col gap-3 relative z-10">
+              {user?.dailyPlan?.map((task: any) => (
+                  <div key={task._id} className="flex items-center gap-3 group">
+                      <button 
+                          onClick={async () => {
+                              // Toggle Local State optimistically
+                              const newPlan = user.dailyPlan.map((t: any) => t._id === task._id ? {...t, completed: !t.completed} : t);
+                              setUser({...user, dailyPlan: newPlan});
+                              
+                              // API Call
+                              await fetch('/api/dailyplan', {
+                                  method: 'PUT',
+                                  body: JSON.stringify({ taskId: task._id })
+                              });
+                          }}
+                          className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-green-500 border-green-500' : 'border-stone-300 hover:border-stone-400'}`}
+                      >
+                          {task.completed && <span className="text-white font-bold text-xs">✓</span>}
+                      </button>
+                      <span className={`text-lg font-bold transition-all ${task.completed ? 'text-stone-300 line-through' : 'text-stone-700'}`}>
+                          {task.text}
+                      </span>
+                      <button 
+                          onClick={async () => {
+                              const newPlan = user.dailyPlan.filter((t: any) => t._id !== task._id);
+                              setUser({...user, dailyPlan: newPlan});
+                              await fetch('/api/dailyplan', { method: 'DELETE', body: JSON.stringify({ taskId: task._id })});
+                          }}
+                          className="opacity-0 group-hover:opacity-100 ml-auto text-red-300 hover:text-red-500 font-bold px-2"
+                      >
+                          ×
+                      </button>
+                  </div>
+              ))}
+              
+              {(!user?.dailyPlan || user.dailyPlan.length === 0) && (
+                  <div className="text-stone-400 italic">No tasks for today. Add one below!</div>
+              )}
+
+              <form 
+                  onSubmit={async (e) => {
+                      e.preventDefault();
+                      const input = (e.target as any).taskInput;
+                      const text = input.value;
+                      if (!text) return;
+                      
+                      input.value = ''; // clear input
+                      
+                      // Refetch to get updated list with ID
+                      const res = await fetch('/api/dailyplan', {
+                          method: 'POST',
+                          body: JSON.stringify({ text })
+                      });
+                      const data = await res.json();
+                      setUser({...user, dailyPlan: data.dailyPlan});
+                  }}
+                  className="mt-4 flex gap-2"
+              >
+                  <input 
+                      name="taskInput"
+                      placeholder="+ Add a new task..." 
+                      className="flex-1 bg-transparent border-b-2 border-stone-200 focus:border-stone-400 outline-none p-2 font-bold text-stone-600 placeholder-stone-300"
+                  />
+              </form>
+          </div>
+      </div>
 
       {/* New Habit Form */}
       {showForm && (

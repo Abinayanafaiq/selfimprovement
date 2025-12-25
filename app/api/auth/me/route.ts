@@ -28,7 +28,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ user: null }, { status: 200 });
     }
 
-    return NextResponse.json({ user: { id: user._id, username: user.username, wins: user.wins } }, { status: 200 });
+    return NextResponse.json({ 
+        user: { 
+            id: user._id, 
+            username: user.username, 
+            wins: user.wins,
+            dailyPlan: user.dailyPlan 
+        } 
+    }, { status: 200 });
 
   } catch (error) {
     return NextResponse.json({ user: null }, { status: 200 }); // Fail silently for 'me' check

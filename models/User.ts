@@ -27,4 +27,9 @@ const UserSchema = new mongoose.Schema({
   wins: { type: Number, default: 0 }, // Total completions
 }, { timestamps: true });
 
+// Force model refresh in dev
+if (process.env.NODE_ENV === 'development') {
+  delete mongoose.models.User;
+}
+
 export default mongoose.models.User || mongoose.model('User', UserSchema);

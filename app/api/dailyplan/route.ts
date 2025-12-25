@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { verifyJwt } from '@/lib/auth';
+import { verifyJWT } from '@/lib/auth';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const payload = await verifyJwt(token.value);
+    const payload = await verifyJWT(token.value);
     if (!payload) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
@@ -43,7 +43,10 @@ export async function PUT(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const payload = await verifyJwt(token.value);
+    const payload = await verifyJWT(token.value);
+    if (!payload) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
     const { taskId } = await req.json();
 
     const user = await User.findById(payload.userId);
@@ -69,7 +72,10 @@ export async function DELETE(req: Request) {
           return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
   
-      const payload = await verifyJwt(token.value);
+      const payload = await verifyJWT(token.value);
+    if (!payload) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
       const { taskId } = await req.json();
   
       const user = await User.findById(payload.userId);
