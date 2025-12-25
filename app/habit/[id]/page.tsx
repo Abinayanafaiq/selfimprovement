@@ -107,31 +107,32 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Members Section */}
-        <div className="glass-panel p-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+        <div className="glass-panel p-8 animate-fade-in border-stone-100" style={{ animationDelay: '0.1s' }}>
+            <h2 className="text-xl font-black text-stone-800 mb-6 flex items-center gap-2">
                 👥 Squad Members
             </h2>
             <div className="space-y-4">
-                {members.map((m: any) => (
-                    <div key={m._id} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
+                {members.map((m: any, idx: number) => (
+                    <div key={m._id} className="flex items-center justify-between p-4 rounded-2xl bg-stone-50 border-2 border-stone-100">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl shadow-inner ${['bg-green-400', 'bg-orange-400', 'bg-yellow-400'][idx % 3]}`}>
                                 {m.username[0].toUpperCase()}
                             </div>
                             <div>
-                                <p className="font-semibold text-slate-900">{m.username}</p>
-                                <p className="text-xs text-slate-500">Total Wins: {m.wins}</p>
+                                <p className="font-bold text-stone-800 text-lg">{m.username}</p>
+                                <p className="text-xs text-stone-400 font-bold uppercase tracking-wider">Lvl. {Math.floor((m.wins || 0) / 5) + 1} Sprout</p>
                             </div>
                         </div>
                         {m._id === habit.userId._id && (
-                            <span className="text-xs font-medium text-amber-500 bg-amber-50 px-2 py-1 rounded">Owner</span>
+                            <span className="text-[10px] font-black text-orange-600 bg-orange-100 px-3 py-1 rounded-full border border-orange-200 uppercase tracking-widest">Leader</span>
                         )}
                     </div>
                 ))}
             </div>
             
-            <div className="mt-6 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 text-center">
-                <p className="text-sm text-indigo-600 font-medium">
+            <div className="mt-6 p-6 bg-yellow-50/50 rounded-3xl border-2 border-yellow-100 text-center relative overflow-hidden">
+                 <div className="absolute -left-4 -top-4 text-6xl opacity-10 rotate-12">❝</div>
+                <p className="text-sm text-yellow-800 font-bold italic relative z-10">
                     "Alone we go faster, together we go further."
                 </p>
             </div>
@@ -140,12 +141,12 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
         {/* Activty Log & Chat */}
         <div className="space-y-6">
             {/* Chat Section */}
-            <div className="glass-panel p-6 animate-fade-in flex flex-col h-[500px]" style={{ animationDelay: '0.2s' }}>
-                <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <div className="glass-panel p-6 animate-fade-in flex flex-col h-[600px] border-stone-100 relative" style={{ animationDelay: '0.2s' }}>
+                <h2 className="text-xl font-black text-stone-800 mb-4 flex items-center gap-2">
                     💬 Team Chat
                 </h2>
                 
-                <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
+                <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 custom-scrollbar">
                     {habit.chat && habit.chat.length > 0 ? (
                         habit.chat.map((msg: any, idx: number) => {
                            // Fallback if sender is null (deleted user)
@@ -155,15 +156,17 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
                            
                            return (
                                <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                   <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${isMe ? 'bg-indigo-500 text-white rounded-br-none' : 'bg-slate-100 text-slate-800 rounded-bl-none'}`}>
-                                       {!isMe && <p className="text-[10px] opacity-70 mb-1 font-bold">{senderName}</p>}
-                                       <p>{msg.message}</p>
+                                   <div className={`max-w-[85%] p-4 rounded-3xl text-sm font-medium shadow-sm ${isMe ? 'bg-green-500 text-white rounded-br-none' : 'bg-stone-100 text-stone-700 rounded-bl-none border border-stone-200'}`}>
+                                       {!isMe && <p className="text-[10px] opacity-60 mb-1 font-bold uppercase tracking-wide text-stone-500">{senderName}</p>}
+                                       <p className="leading-relaxed">{msg.message}</p>
                                    </div>
                                </div>
                            );
                         })
                     ) : (
-                        <div className="text-center text-slate-400 py-10">No messages yet. Say hi!</div>
+                        <div className="text-center text-stone-300 py-20 font-bold text-sm">
+                            No messages yet.<br/>Say hi to your squad! 👋
+                        </div>
                     )}
                 </div>
 
@@ -172,41 +175,37 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
                         value={newMessage}
                         onChange={e => setNewMessage(e.target.value)}
                         placeholder="Type a message..."
-                        className="flex-1 text-sm bg-slate-50 border-slate-200 focus:bg-white"
+                        className="flex-1 p-3 bg-stone-50 border-2 border-stone-100 rounded-xl focus:border-green-400 focus:bg-white outline-none font-bold text-stone-700 placeholder-stone-400"
                     />
-                    <button type="submit" className="btn btn-primary p-3 rounded-xl aspect-square flex items-center justify-center">
+                    <button type="submit" className="btn btn-primary p-3 rounded-xl aspect-square flex items-center justify-center shadow-green-200">
                         ➤
                     </button>
                 </form>
-                {/* DEBUG INFO */}
-                <div className="text-[10px] text-slate-300 mt-2 text-center">
-                    Debug: Chat Length {habit.chat?.length || 0} | User ID: {user?.id}
-                </div>
             </div>
 
             {/* Activity Log (Moved down) */}
-            <div className="glass-panel p-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <div className="glass-panel p-6 animate-fade-in border-stone-100" style={{ animationDelay: '0.3s' }}>
+                <h2 className="text-lg font-black text-stone-800 mb-4 flex items-center gap-2">
                     📅 Activity Log
                 </h2>
                 
                 {habit.completedDates && habit.completedDates.length > 0 ? (
-                    <div className="space-y-3">
-                        {habit.completedDates.slice().reverse().slice(0, 3).map((dateStr: string, idx: number) => {
+                    <div className="relative border-l-2 border-stone-100 ml-3 space-y-6 py-2">
+                        {habit.completedDates.slice().reverse().slice(0, 5).map((dateStr: string, idx: number) => {
                             const date = new Date(dateStr);
                             return (
-                                <div key={idx} className="flex items-center gap-3 text-sm p-3 hover:bg-slate-50 rounded-lg transition-colors">
-                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                    <span className="text-slate-700">Streak extended</span>
-                                    <span className="font-mono text-slate-500 ml-auto">
-                                        {date.toLocaleDateString()}
-                                    </span>
+                                <div key={idx} className="flex items-center gap-4 pl-4 relative">
+                                    <div className="absolute -left-[9px] w-4 h-4 rounded-full bg-green-400 border-4 border-white shadow-sm"></div>
+                                    <div>
+                                        <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">{date.toLocaleDateString()}</p>
+                                        <p className="text-sm font-bold text-stone-700">Streak Extended! 🔥</p>
+                                    </div>
                                 </div>
                             );
                         })}
                     </div>
                 ) : (
-                    <div className="text-center py-4 text-slate-400 text-sm">
+                    <div className="text-center py-6 text-stone-300 font-bold text-sm bg-stone-50 rounded-2xl border-2 border-stone-100 border-dashed">
                         No activity yet.
                     </div>
                 )}

@@ -98,43 +98,86 @@ export default function Home() {
             <p className="text-4xl font-bold text-slate-800">{habits.length}</p>
         </div>
 
-        <div className="glass-panel p-6 flex flex-col justify-center items-center text-center relative overflow-hidden">
-            {/* Simple CSS Mascot Blob */}
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-green-400 rounded-full opacity-20 animate-pulse"></div>
-            <div className="absolute top-2 left-2 text-3xl animate-bounce" style={{ animationDuration: '3s' }}>🌱</div>
-            
-            <h2 className="text-lg font-bold mb-2 text-stone-700">Start New Habit</h2>
-            <button 
-                onClick={() => setShowForm(!showForm)}
-                className="btn btn-primary w-full max-w-[200px] z-10"
-            >
-                {showForm ? 'Cancel' : '+ New Habit'}
-            </button>
+        {/* Mascot Evolution Card */}
+        <div className="glass-panel p-6 flex flex-col justify-center items-center text-center relative overflow-hidden group">
+            {/* Dynamic Mascot Logic */}
+            {(() => {
+                const wins = user?.wins || 0;
+                let mascot = { stage: 'Seed', emoji: '🌱', scale: 1, next: 5, color: 'bg-green-400' };
+                
+                if (wins >= 50) mascot = { stage: 'Spirit of the Forest', emoji: '🧚', scale: 1.5, next: 100, color: 'bg-indigo-400' };
+                else if (wins >= 20) mascot = { stage: 'Mighty Tree', emoji: '🌳', scale: 1.3, next: 50, color: 'bg-emerald-500' };
+                else if (wins >= 5) mascot = { stage: 'Happy Sprout', emoji: '🌿', scale: 1.1, next: 20, color: 'bg-green-500' };
+
+                const progress = Math.min(100, (wins / mascot.next) * 100);
+
+                return (
+                    <>
+                         {/* Background Blob */}
+                        <div className={`absolute -right-4 -bottom-4 w-32 h-32 ${mascot.color} rounded-full opacity-20 animate-pulse transition-all duration-1000`}></div>
+                        
+                        {/* Mascot Emoji */}
+                        <div className="relative z-10 mb-2 transform transition-transform duration-500 hover:scale-125 cursor-pointer" style={{ fontSize: '4rem' }}>
+                            {mascot.emoji}
+                        </div>
+                        
+                        {/* Title & Level */}
+                        <h2 className="text-lg font-black text-stone-700 leading-tight">{mascot.stage}</h2>
+                        <p className="text-xs text-stone-400 font-bold uppercase tracking-wider mb-3">Lvl. {Math.floor(wins / 5) + 1}</p>
+
+                        {/* Evolution Progress Bar */}
+                        <div className="w-full bg-stone-100 rounded-full h-2 mb-1 overflow-hidden">
+                            <div className={`h-full ${mascot.color} transition-all duration-1000`} style={{ width: `${progress}%` }}></div>
+                        </div>
+                        <p className="text-[10px] text-stone-400 font-bold">{wins} / {mascot.next} Wins to Evolve</p>
+
+                        <button 
+                            onClick={() => setShowForm(!showForm)}
+                            className="btn btn-primary w-full mt-4 z-10 text-sm py-2"
+                        >
+                            {showForm ? 'Cancel' : '+ New Habit'}
+                        </button>
+                    </>
+                );
+            })()}
         </div>
       </div>
 
       {/* New Habit Form */}
       {showForm && (
-        <div className="glass-panel p-6 mb-8 animate-fade-in border-blue-100 shadow-sm">
-            <h3 className="text-xl font-bold mb-4 text-slate-800">Create New Habit <span className="text-sm font-normal text-muted ml-2">(Solo or Team)</span></h3>
-            <form onSubmit={handleCreate} className="flex flex-col gap-4">
+        <div className="glass-panel p-8 mb-8 animate-fade-in border-stone-200 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-10 opacity-10 font-[900] text-9xl text-stone-300 pointer-events-none rotate-12">
+                +
+            </div>
+            
+            <h3 className="text-2xl font-black mb-6 text-stone-800 flex items-center gap-2">
+                Create New Habit <span className="px-2 py-1 bg-stone-100 rounded-full text-xs font-bold text-stone-500">Solo or Team</span>
+            </h3>
+            
+            <form onSubmit={handleCreate} className="flex flex-col gap-4 relative z-10">
                 <input 
-                    placeholder="Habit Title (e.g. Meditate for 10 mins)" 
+                    placeholder="Habit Title (e.g. Drink Water)" 
                     value={newTitle}
                     onChange={e => setNewTitle(e.target.value)}
                     required
+                    className="p-4 bg-stone-50 border-2 border-stone-100 rounded-2xl focus:border-green-400 focus:bg-white text-lg font-bold placeholder-stone-400"
                 />
                 <input 
-                    placeholder="Description (Optional)" 
+                    placeholder="Why do you want to build this habit?" 
                     value={newDesc}
                     onChange={e => setNewDesc(e.target.value)}
+                    className="p-4 bg-stone-50 border-2 border-stone-100 rounded-2xl focus:border-green-400 focus:bg-white font-medium placeholder-stone-400"
                 />
-                <input 
-                    placeholder="Partner Username (Optional) - Grow streak together!" 
-                    value={newPartner}
-                    onChange={e => setNewPartner(e.target.value)}
-                />
-                <button className="btn btn-primary self-start">Create Habit</button>
+                <div className="p-4 bg-orange-50/50 rounded-2xl border-2 border-orange-100">
+                    <label className="block text-xs font-bold text-orange-800 uppercase mb-2">Grow Together (Optional)</label>
+                    <input 
+                        placeholder="Partner Username" 
+                        value={newPartner}
+                        onChange={e => setNewPartner(e.target.value)}
+                        className="w-full p-3 bg-white border-2 border-orange-200 rounded-xl focus:border-orange-400 outline-none font-bold text-orange-900 placeholder-orange-300/70"
+                    />
+                </div>
+                <button className="btn btn-primary self-start text-lg px-8 py-4 shadow-xl shadow-green-200 mt-2">✨ Create Habit</button>
             </form>
         </div>
       )}
