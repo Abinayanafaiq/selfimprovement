@@ -1,26 +1,109 @@
-@import "tailwindcss";
+
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F2F2F7;
+  --primary: #007AFF;
+  --secondary: #34C759;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.text-muted {
+    color: #8E8E93; /* iOS Gray */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: #1C1C1E;
+  min-height: 100vh;
+}
+
+/* iOS Clean Background (No Animation) */
+.animated-bg {
+    display: none;
+}
+
+/* iOS Card / Glass Panel */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+  border-radius: 1.5rem; /* rounded-3xl */
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E5EA;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: #1C1C1E;
+    outline: none;
+    transition: all 0.2s;
+    font-size: 16px; /* Prevents zoom on iOS */
+}
+input:focus {
+    border-color: #007AFF;
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border: none;
+}
+.btn:active {
+    transform: scale(0.96);
+}
+
+.btn-primary {
+    background-color: #007AFF;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+.btn-primary:hover {
+    background-color: #0062cc;
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+}
+
+.btn-secondary {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #007AFF;
+}
+.btn-secondary:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Typography & Text Gradients */
+.title-gradient {
+    color: #1C1C1E; /* Solid color for minimalism */
+    background: none;
+    -webkit-text-fill-color: #1C1C1E;
+}
+
+/* Animations */
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in {
+    animation: fadeInScale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Animations */
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in {
+    animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
