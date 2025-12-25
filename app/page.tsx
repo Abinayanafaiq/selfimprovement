@@ -98,11 +98,15 @@ export default function Home() {
             <p className="text-4xl font-bold text-slate-800">{habits.length}</p>
         </div>
 
-        <div className="glass-panel p-6 flex flex-col justify-center items-center text-center">
-            <h2 className="text-lg font-semibold mb-2">Build Your Legacy</h2>
+        <div className="glass-panel p-6 flex flex-col justify-center items-center text-center relative overflow-hidden">
+            {/* Simple CSS Mascot Blob */}
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-green-400 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute top-2 left-2 text-3xl animate-bounce" style={{ animationDuration: '3s' }}>🌱</div>
+            
+            <h2 className="text-lg font-bold mb-2 text-stone-700">Start New Habit</h2>
             <button 
                 onClick={() => setShowForm(!showForm)}
-                className="btn btn-primary w-full max-w-[200px]"
+                className="btn btn-primary w-full max-w-[200px] z-10"
             >
                 {showForm ? 'Cancel' : '+ New Habit'}
             </button>

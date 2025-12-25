@@ -12,7 +12,7 @@ export default function Navbar({ user }: { user: any }) {
   };
 
   return (
-    <nav className="mb-8 p-4 flex justify-between items-center sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+    <nav className="mb-8 p-4 flex justify-between items-center sticky top-0 z-50 bg-[#FDFBF7]/90 backdrop-blur-md">
       <Link href="/" className="text-xl font-bold title-gradient">
         SelfImprovement
       </Link>

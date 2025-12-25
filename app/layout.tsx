@@ -1,8 +1,8 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Nunito } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+const nunito = Nunito({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'SelfImprovement',
@@ -24,9 +24,9 @@ export default function RootLayout({
               theme: {
                 extend: {
                   colors: {
-                    background: '#F2F2F7', // iOS System Background
-                    primary: '#007AFF', // iOS Blue
-                    secondary: '#34C759', // iOS Green
+                    background: '#FDFBF7', // Warm Cream
+                    primary: '#4ADE80', // Playful Green
+                    secondary: '#FEF08A', // Soft Yellow
                   }
                 }
               }
@@ -34,7 +34,7 @@ export default function RootLayout({
           `
         }} />
       </head>
-      <body className="text-slate-900 antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' }}>
+      <body className={`${nunito.className} text-stone-800 antialiased bg-[#FDFBF7]`}>
         <div className="animated-bg"></div>
         {children}
       </body>
