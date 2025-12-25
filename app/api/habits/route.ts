@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Habit from '@/models/Habit';
+import User from '@/models/User';
 import { verifyJWT } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
@@ -39,13 +40,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { title, description } = await req.json();
+    const { title, description, partnerUsername } = await req.json();
     await dbConnect();
+
+    let sharedWith = [];
+    if (partnerUsername) {
+        const partner = await User.findOne({ username: partnerUsername });
+        if (partner) {
+            sharedWith.push(partner._id);
+        }
+    }
 
     const newHabit = await Habit.create({
       title,
       description,
       userId: user.userId,
+      sharedWith
     });
 
     return NextResponse.json({ habit: newHabit }, { status: 201 });

@@ -1,12 +1,14 @@
 'use client';
 import { useState } from 'react';
 
-interface HabitProps {
+import Link from 'next/link';
+
+interface HabitCardProps {
   habit: any;
   onUpdate: () => void;
 }
 
-export default function HabitCard({ habit, onUpdate }: HabitProps) {
+export default function HabitCard({ habit, onUpdate }: HabitCardProps) {
   const [loading, setLoading] = useState(false);
 
   // Check if completed today
@@ -64,23 +66,31 @@ export default function HabitCard({ habit, onUpdate }: HabitProps) {
       } catch (e) { console.error(e); }
   }
 
+  const isShared = habit.sharedWith && habit.sharedWith.length > 0;
+
   return (
-    <div className="glass-panel p-6 flex flex-col justify-between h-full relative group hover:shadow-lg transition-shadow">
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={deleteHabit} className="text-xs text-red-500 hover:text-red-600 bg-red-50 px-2 py-1 rounded">Delete</button>
+    <div className={`glass-panel p-6 flex flex-col justify-between h-full relative group hover:shadow-lg transition-shadow ${isShared ? 'border-indigo-200 bg-indigo-50/30' : ''}`}>
+      <div className="absolute top-4 right-4 flex gap-2">
+        {isShared && (
+            <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold uppercase tracking-wide">
+                Team Habit
+            </span>
+        )}
+        <button onClick={deleteHabit} className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-red-500 hover:text-red-600 bg-red-50 px-2 py-0.5 rounded">Delete</button>
       </div>
 
       <div>
-        <h3 className="text-xl font-bold mb-2 text-slate-800">{habit.title}</h3>
+        <Link href={`/habit/${habit._id}`} className="block group-hover:text-primary transition-colors">
+            <h3 className="text-xl font-bold mb-2 text-slate-800">{habit.title} →</h3>
+        </Link>
         <p className="text-muted text-sm mb-4 line-clamp-2">{habit.description || 'No description'}</p>
       </div>
 
       <div className="mt-auto">
         <div className="flex justify-between items-center mb-4 text-xs text-muted font-mono">
-            <span>Streak: <strong className="text-blue-600">{habit.streak}</strong> 🔥</span>
+            <span>{isShared ? 'Team Streak' : 'Streak'}: <strong className={`text-lg ${isShared ? 'text-indigo-600' : 'text-blue-600'}`}>{habit.streak}</strong> 🔥</span>
             <div className="flex gap-2">
-                {habit.sharedWith.length > 0 && <span className="text-blue-500" title="Shared Habit">👥</span>}
-                <button onClick={handleShare} className="hover:text-blue-600 transition-colors">↗ Share</button>
+                {!isShared && <button onClick={handleShare} className="hover:text-blue-600 transition-colors">↗ Share</button>}
             </div>
         </div>
 
@@ -89,7 +99,7 @@ export default function HabitCard({ habit, onUpdate }: HabitProps) {
           disabled={isCompletedToday || loading}
           className={`w-full btn ${isCompletedToday 
             ? 'bg-emerald-100 text-emerald-700 cursor-default border border-emerald-200' 
-            : 'btn-primary'}`}
+            : isShared ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200' : 'btn-primary'}`}
         >
           {loading ? '...' : isCompletedToday ? 'Completed Today' : 'Mark Complete'}
         </button>

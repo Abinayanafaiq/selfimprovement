@@ -15,6 +15,7 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
+  const [newPartner, setNewPartner] = useState('');
 
   const fetchData = async () => {
     try {
@@ -48,10 +49,11 @@ export default function Home() {
     e.preventDefault();
     await fetch('/api/habits', {
         method: 'POST',
-        body: JSON.stringify({ title: newTitle, description: newDesc })
+        body: JSON.stringify({ title: newTitle, description: newDesc, partnerUsername: newPartner })
     });
     setNewTitle('');
     setNewDesc('');
+    setNewPartner('');
     setShowForm(false);
     fetchData();
   };
@@ -110,7 +112,7 @@ export default function Home() {
       {/* New Habit Form */}
       {showForm && (
         <div className="glass-panel p-6 mb-8 animate-fade-in border-blue-100 shadow-sm">
-            <h3 className="text-xl font-bold mb-4 text-slate-800">Create New Habit</h3>
+            <h3 className="text-xl font-bold mb-4 text-slate-800">Create New Habit <span className="text-sm font-normal text-muted ml-2">(Solo or Team)</span></h3>
             <form onSubmit={handleCreate} className="flex flex-col gap-4">
                 <input 
                     placeholder="Habit Title (e.g. Meditate for 10 mins)" 
@@ -122,6 +124,11 @@ export default function Home() {
                     placeholder="Description (Optional)" 
                     value={newDesc}
                     onChange={e => setNewDesc(e.target.value)}
+                />
+                <input 
+                    placeholder="Partner Username (Optional) - Grow streak together!" 
+                    value={newPartner}
+                    onChange={e => setNewPartner(e.target.value)}
                 />
                 <button className="btn btn-primary self-start">Create Habit</button>
             </form>

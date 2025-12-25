@@ -5,6 +5,38 @@ import User from '@/models/User'; // Import User to update wins
 import { verifyJWT } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    const user = token ? await verifyJWT(token) : null;
+
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    await dbConnect();
+    const habit = await Habit.findOne({ _id: id })
+        .populate('userId', 'username wins')
+        .populate('sharedWith', 'username wins');
+
+    if (!habit) {
+      return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
+    }
+
+    // Check access
+    if (habit.userId._id.toString() !== user.userId && !habit.sharedWith.some((u: any) => u._id.toString() === user.userId)) {
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 403 });
+    }
+
+    return NextResponse.json({ habit });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
