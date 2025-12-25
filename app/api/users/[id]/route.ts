@@ -18,7 +18,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
     await dbConnect();
 
-    const user = await User.findById(id).select('username wins createdAt');
+    const user = await User.findById(id).select('username wins createdAt dailyPlan');
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
