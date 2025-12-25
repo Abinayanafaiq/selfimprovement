@@ -41,4 +41,9 @@ const HabitSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// Force recompilation in dev to catch schema changes
+if (process.env.NODE_ENV === 'development') {
+  delete mongoose.models.Habit;
+}
+
 export default mongoose.models.Habit || mongoose.model('Habit', HabitSchema);

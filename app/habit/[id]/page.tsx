@@ -178,6 +178,10 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
                         ➤
                     </button>
                 </form>
+                {/* DEBUG INFO */}
+                <div className="text-[10px] text-slate-300 mt-2 text-center">
+                    Debug: Chat Length {habit.chat?.length || 0} | User ID: {user?.id}
+                </div>
             </div>
 
             {/* Activity Log (Moved down) */}

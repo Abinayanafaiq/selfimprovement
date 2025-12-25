@@ -133,12 +133,20 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         }
       } else if (action === 'chat') {
           const { message } = body;
-          if (!habit.chat) habit.chat = [];
+          console.log(`[API Chat] Received message from ${user.userId}: ${message}`);
+          
+          if (!habit.chat) {
+              console.log('[API Chat] Initializing chat array');
+              habit.chat = [];
+          }
+          
           habit.chat.push({
               sender: user.userId,
               message
           });
-          await habit.save();
+          
+          const saved = await habit.save();
+          console.log('[API Chat] Message saved. Chat length:', saved.chat.length);
       } else if (action === 'share') {
           console.log('Sharing with:', targetUsername);
           const targetUser = await User.findOne({ username: targetUsername });
