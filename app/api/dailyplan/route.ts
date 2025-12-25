@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { verifyJWT } from '@/lib/auth';
+import { verifyJWT } from '@/lib/auth'; // Correct import
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 
@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const cookieStore = await cookies();
-    const token = cookieStore.get('token');
+    const token = await cookieStore.get('token');
 
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,6 +23,9 @@ export async function POST(req: Request) {
     
     // Add new task
     const user = await User.findById(payload.userId);
+    if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
     user.dailyPlan.push({ text, completed: false });
     await user.save();
 
@@ -37,7 +40,7 @@ export async function PUT(req: Request) {
   try {
     await dbConnect();
     const cookieStore = await cookies();
-    const token = cookieStore.get('token');
+    const token = await cookieStore.get('token');
 
     if (!token) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -45,11 +48,14 @@ export async function PUT(req: Request) {
 
     const payload = await verifyJWT(token.value);
     if (!payload) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
     const { taskId } = await req.json();
 
     const user = await User.findById(payload.userId);
+    if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
     const task = user.dailyPlan.id(taskId);
     if (task) {
         task.completed = !task.completed;
@@ -66,19 +72,22 @@ export async function DELETE(req: Request) {
     try {
       await dbConnect();
       const cookieStore = await cookies();
-      const token = cookieStore.get('token');
+      const token = await cookieStore.get('token');
   
       if (!token) {
           return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
   
       const payload = await verifyJWT(token.value);
-    if (!payload) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
+      if (!payload) {
+        return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+      }
       const { taskId } = await req.json();
   
       const user = await User.findById(payload.userId);
+      if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
       user.dailyPlan.pull({ _id: taskId });
       await user.save();
   

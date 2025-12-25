@@ -263,19 +263,19 @@ export default function Home() {
                 Create New Habit <span className="px-2 py-1 bg-stone-100 rounded-full text-xs font-bold text-stone-500">Solo or Team</span>
             </h3>
             
-            <form onSubmit={handleCreate} className="flex flex-col gap-4 relative z-10">
+            <form onSubmit={handleCreate} className="flex flex-col gap-4 relative z-10 text-stone-700">
                 <input 
                     placeholder="Habit Title (e.g. Drink Water)" 
                     value={newTitle}
                     onChange={e => setNewTitle(e.target.value)}
                     required
-                    className="p-4 bg-stone-50 border-2 border-stone-100 rounded-2xl focus:border-green-400 focus:bg-white text-lg font-bold placeholder-stone-400"
+                    className="w-full p-4 bg-stone-50 border-2 border-stone-100 rounded-2xl focus:border-green-400 focus:bg-white text-lg font-bold placeholder-stone-400"
                 />
                 <input 
                     placeholder="Why do you want to build this habit?" 
                     value={newDesc}
                     onChange={e => setNewDesc(e.target.value)}
-                    className="p-4 bg-stone-50 border-2 border-stone-100 rounded-2xl focus:border-green-400 focus:bg-white font-medium placeholder-stone-400"
+                    className="w-full p-4 bg-stone-50 border-2 border-stone-100 rounded-2xl focus:border-green-400 focus:bg-white font-medium placeholder-stone-400"
                 />
                 <div className="p-4 bg-orange-50/50 rounded-2xl border-2 border-orange-100">
                     <label className="block text-xs font-bold text-orange-800 uppercase mb-2">Grow Together (Optional)</label>
@@ -286,7 +286,7 @@ export default function Home() {
                         className="w-full p-3 bg-white border-2 border-orange-200 rounded-xl focus:border-orange-400 outline-none font-bold text-orange-900 placeholder-orange-300/70"
                     />
                 </div>
-                <button className="btn btn-primary self-start text-lg px-8 py-4 shadow-xl shadow-green-200 mt-2">✨ Create Habit</button>
+                <button className="btn btn-primary w-full md:w-auto text-lg px-8 py-4 shadow-xl shadow-green-200 mt-2">✨ Create Habit</button>
             </form>
         </div>
       )}
@@ -302,6 +302,17 @@ export default function Home() {
             </div>
         )}
       </div>
+
+      {/* Mobile FAB (Floating Action Button) */}
+      <button 
+        onClick={() => {
+            setShowForm(!showForm);
+            window.scrollTo({ top: 500, behavior: 'smooth' }); // Scroll partly down where form spawns or just rely on state
+        }}
+        className="fixed bottom-6 right-6 md:hidden z-50 w-14 h-14 bg-green-500 rounded-full shadow-xl shadow-green-500/40 flex items-center justify-center text-white text-3xl font-black transition-transform active:scale-90"
+      >
+        {showForm ? '×' : '+'}
+      </button>
     </main>
   );
 }
