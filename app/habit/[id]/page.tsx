@@ -9,7 +9,28 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
   const [habit, setHabit] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [newMessage, setNewMessage] = useState('');
   const router = useRouter();
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    try {
+        await fetch(`/api/habits/${habit._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'chat', message: newMessage })
+        });
+        setNewMessage('');
+        // Refresh data
+        const res = await fetch(`/api/habits/${habit._id}`);
+        const data = await res.json();
+        setHabit(data.habit);
+    } catch (err) {
+        console.error(err);
+    }
+  };
 
   useEffect(() => {
     // Unwrap params
@@ -115,32 +136,72 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
             </div>
         </div>
 
-        {/* Activity / Calendar Placeholder (Simplistic for now) */}
-        <div className="glass-panel p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                📅 Activity Log
-            </h2>
-            
-            {habit.completedDates && habit.completedDates.length > 0 ? (
-                <div className="space-y-3">
-                    {habit.completedDates.slice().reverse().slice(0, 5).map((dateStr: string, idx: number) => {
-                        const date = new Date(dateStr);
-                        return (
-                            <div key={idx} className="flex items-center gap-3 text-sm p-3 hover:bg-slate-50 rounded-lg transition-colors">
-                                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                <span className="text-slate-700">Streak extended on</span>
-                                <span className="font-mono text-slate-500 ml-auto">
-                                    {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                            </div>
-                        );
-                    })}
+        {/* Activty Log & Chat */}
+        <div className="space-y-6">
+            {/* Chat Section */}
+            <div className="glass-panel p-6 animate-fade-in flex flex-col h-[500px]" style={{ animationDelay: '0.2s' }}>
+                <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    💬 Team Chat
+                </h2>
+                
+                <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
+                    {habit.chat && habit.chat.length > 0 ? (
+                        habit.chat.map((msg: any, idx: number) => {
+                           const isMe = msg.sender._id === user.id;
+                           return (
+                               <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                   <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${isMe ? 'bg-indigo-500 text-white rounded-br-none' : 'bg-slate-100 text-slate-800 rounded-bl-none'}`}>
+                                       {!isMe && <p className="text-[10px] opacity-70 mb-1 font-bold">{msg.sender.username}</p>}
+                                       <p>{msg.message}</p>
+                                   </div>
+                               </div>
+                           );
+                        })
+                    ) : (
+                        <div className="text-center text-slate-400 py-10">No messages yet. Say hi!</div>
+                    )}
                 </div>
-            ) : (
-                <div className="text-center py-10 text-slate-400">
-                    No activity yet. Let's get started!
-                </div>
-            )}
+
+                <form onSubmit={handleSendMessage} className="flex gap-2">
+                    <input 
+                        value={newMessage}
+                        onChange={e => setNewMessage(e.target.value)}
+                        placeholder="Type a message..."
+                        className="flex-1 text-sm bg-slate-50 border-slate-200 focus:bg-white"
+                    />
+                    <button type="submit" className="btn btn-primary p-3 rounded-xl aspect-square flex items-center justify-center">
+                        ➤
+                    </button>
+                </form>
+            </div>
+
+            {/* Activity Log (Moved down) */}
+            <div className="glass-panel p-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    📅 Activity Log
+                </h2>
+                
+                {habit.completedDates && habit.completedDates.length > 0 ? (
+                    <div className="space-y-3">
+                        {habit.completedDates.slice().reverse().slice(0, 3).map((dateStr: string, idx: number) => {
+                            const date = new Date(dateStr);
+                            return (
+                                <div key={idx} className="flex items-center gap-3 text-sm p-3 hover:bg-slate-50 rounded-lg transition-colors">
+                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                    <span className="text-slate-700">Streak extended</span>
+                                    <span className="font-mono text-slate-500 ml-auto">
+                                        {date.toLocaleDateString()}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="text-center py-4 text-slate-400 text-sm">
+                        No activity yet.
+                    </div>
+                )}
+            </div>
         </div>
       </div>
     </main>

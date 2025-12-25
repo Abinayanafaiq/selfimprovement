@@ -19,7 +19,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     await dbConnect();
     const habit = await Habit.findOne({ _id: id })
         .populate('userId', 'username wins')
-        .populate('sharedWith', 'username wins');
+        .populate('sharedWith', 'username wins')
+        .populate('chat.sender', 'username');
 
     if (!habit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
@@ -122,6 +123,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             // Update User Wins (Keep individual wins? Yes, individual effort counts)
             await User.findByIdAndUpdate(user.userId, { $inc: { wins: 1 } });
         }
+      } else if (action === 'chat') {
+          const { message } = body;
+          habit.chat.push({
+              sender: user.userId,
+              message
+          });
+          await habit.save();
       } else if (action === 'share') {
           console.log('Sharing with:', targetUsername);
           const targetUser = await User.findOne({ username: targetUsername });

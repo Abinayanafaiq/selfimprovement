@@ -30,6 +30,11 @@ const HabitSchema = new mongoose.Schema({
     date: { type: Date },
     completedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
   },
+  chat: [{
+    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    message: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+  }],
   isArchived: {
     type: Boolean,
     default: false,
