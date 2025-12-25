@@ -40,7 +40,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
       }
   
-      const { action } = await req.json(); // action: 'complete'
+      const body = await req.json();
+      const { action, targetUsername } = body;
   
       await dbConnect();
       const habit = await Habit.findOne({ _id: id });
@@ -74,7 +75,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             await User.findByIdAndUpdate(user.userId, { $inc: { wins: 1 } });
         }
       } else if (action === 'share') {
-          const { targetUsername } = await req.json();
+          console.log('Sharing with:', targetUsername);
           const targetUser = await User.findOne({ username: targetUsername });
           if (!targetUser) {
               return NextResponse.json({ message: 'User not found' }, { status: 404 });
