@@ -5,8 +5,16 @@ import { Nunito } from 'next/font/google';
 const nunito = Nunito({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'SelfImprovement',
-  description: 'Track your habits and compete with friends',
+  title: "SelfImprovement",
+  description: "Track habits and grow with friends.",
+  manifest: '/manifest.json', // Next.js auto-generates this from manifest.ts
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
+  themeColor: '#FDFBF7',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SelfImprovement',
+  },
 };
 
 export default function RootLayout({
