@@ -34,7 +34,7 @@ export default function RootLayout({
           `
         }} />
       </head>
-      <body className={`${inter.className} text-slate-900 antialiased`}>
+      <body className="text-slate-900 antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' }}>
         <div className="animated-bg"></div>
         {children}
       </body>

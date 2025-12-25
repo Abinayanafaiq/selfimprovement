@@ -51,15 +51,16 @@ input:focus {
 /* Buttons */
 .btn {
     padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.2s;
+    border-radius: 9999px; /* rounded-full for iOS pill style */
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     cursor: pointer;
     border: none;
+    font-size: 15px;
 }
 .btn:active {
     transform: scale(0.96);
@@ -68,11 +69,11 @@ input:focus {
 .btn-primary {
     background-color: #007AFF;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
 }
 .btn-primary:hover {
-    background-color: #0062cc;
-    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+    background-color: #0071eb;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
 }
 
 .btn-secondary {
