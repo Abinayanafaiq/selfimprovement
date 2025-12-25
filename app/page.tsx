@@ -93,9 +93,43 @@ export default function Home() {
             <p className="text-4xl font-bold text-slate-800">{winRate}%</p>
         </div>
         
-        <div className="glass-panel p-6 bg-emerald-50/50 border-emerald-100">
-            <h2 className="text-sm font-semibold text-emerald-600 uppercase tracking-wider mb-1">Active Habits</h2>
-            <p className="text-4xl font-bold text-slate-800">{habits.length}</p>
+        {/* Zen Garden Card */}
+        <div className="glass-panel p-6 bg-emerald-50/50 border-emerald-100 relative overflow-hidden">
+            <h2 className="text-sm font-black text-emerald-600 uppercase tracking-wider mb-3 z-10 relative">My Zen Garden 🌻</h2>
+            
+            {habits.length === 0 ? (
+                <div className="text-center text-emerald-400 mt-4 text-xs font-bold">Plant a habit to start!</div>
+            ) : (
+                <div className="grid grid-cols-4 gap-2 z-10 relative">
+                    {habits.map((h: any, i: number) => {
+                        // Determine Plant Stage based on Streak
+                        let plant = '🌱'; // Default Sprout
+                        if (h.streak >= 30) plant = '🌳'; // Mighty Tree
+                        else if (h.streak >= 14) plant = '🌷'; // Tulip
+                        else if (h.streak >= 7) plant = '🌻'; // Sunflower
+                        else if (h.streak >= 3) plant = '🌿'; // Herb
+                        else if (h.streak === 0) plant = '🌰'; // Seed
+
+                        // Check if watered (completed today)
+                        // Note: completedDates stores strings or Date objects. Simplified check:
+                        const lastCompleted = h.completedDates?.length > 0 ? new Date(h.completedDates[h.completedDates.length - 1]).toDateString() : '';
+                        const today = new Date().toDateString();
+                        const isWatered = lastCompleted === today;
+
+                        return (
+                            <div key={i} className="flex flex-col items-center group relative cursor-help" title={`${h.title}: ${h.streak} day streak`}>
+                                <div className={`text-2xl transition-all duration-500 ${isWatered ? 'scale-110 drop-shadow-md animate-bounce' : 'opacity-60 grayscale-[50%] scale-90'}`} style={{ animationDuration: '2s' }}>
+                                    {plant}
+                                </div>
+                                {!isWatered && <div className="absolute -top-1 -right-1 text-[8px] animate-pulse">💧</div>}
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
+            
+            {/* Background Decoration */}
+            <div className="absolute bottom-0 left-0 w-full h-8 bg-emerald-100/30 skew-y-3"></div>
         </div>
 
         {/* Mascot Evolution Card */}

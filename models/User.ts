@@ -16,6 +16,12 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   }],
+  // Daily Plan (Tasks)
+  dailyPlan: [{
+    text: String,
+    completed: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now }
+  }],
   // For caching simple analytics
   totalHabits: { type: Number, default: 0 },
   wins: { type: Number, default: 0 }, // Total completions
