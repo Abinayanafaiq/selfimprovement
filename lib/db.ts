@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-// Prioritize the hardcoded string for now to ensure the new password is used
-const MONGODB_URI = "mongodb+srv://abinayanafaiq550:GRu3y5kH8XDTYDGD@selfimprovement.d8oboxb.mongodb.net/?appName=selfimprovement";
+// Connection string from .env.local
+const MONGODB_URI = process.env.MONGODB_URI!;
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
