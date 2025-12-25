@@ -6,19 +6,14 @@ import Link from 'next/link';
 interface HabitCardProps {
   habit: any;
   onUpdate: () => void;
+  currentUser: any;
 }
 
-export default function HabitCard({ habit, onUpdate }: HabitCardProps) {
+export default function HabitCard({ habit, onUpdate, currentUser }: { habit: any, onUpdate: () => void, currentUser: any }) {
   const [loading, setLoading] = useState(false);
 
-  // Check if completed today
-  const isCompletedToday = habit.completedDates.some((date: string) => {
-    const d = new Date(date);
-    const today = new Date();
-    return d.getDate() === today.getDate() &&
-           d.getMonth() === today.getMonth() &&
-           d.getFullYear() === today.getFullYear();
-  });
+  // Check if completed today by THIS user
+  const isCompletedToday = habit.dailyProgress?.completedBy?.includes(currentUser?._id) || false;
 
   const completeHabit = async () => {
     if (loading || isCompletedToday) return;
@@ -101,7 +96,7 @@ export default function HabitCard({ habit, onUpdate }: HabitCardProps) {
             ? 'bg-emerald-100 text-emerald-700 cursor-default border border-emerald-200' 
             : isShared ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200' : 'btn-primary'}`}
         >
-          {loading ? '...' : isCompletedToday ? 'Completed Today' : 'Mark Complete'}
+          {loading ? '...' : isCompletedToday ? (isShared && !habit.completedDates.includes(new Date().toISOString().split('T')[0]) ? 'Done! Waiting for Team...' : 'Completed Today') : 'Mark Complete'}
         </button>
       </div>
     </div>

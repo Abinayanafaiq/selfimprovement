@@ -138,7 +138,7 @@ export default function Home() {
       {/* Habits Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {habits.map((habit: any) => (
-            <HabitCard key={habit._id} habit={habit} onUpdate={fetchData} />
+            <HabitCard key={habit._id} habit={habit} onUpdate={fetchData} currentUser={user} />
         ))}
         {habits.length === 0 && !showForm && (
             <div className="col-span-full text-center py-12 text-muted">

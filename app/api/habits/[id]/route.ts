@@ -91,19 +91,35 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Check if already completed today
-        const completedToday = habit.completedDates.some((date: Date) => {
-            const d = new Date(date);
-            d.setHours(0,0,0,0);
-            return d.getTime() === today.getTime();
-        });
+        // Initialize or Reset Daily Progress if new day
+        const progressDate = habit.dailyProgress?.date ? new Date(habit.dailyProgress.date) : null;
+        if (progressDate) progressDate.setHours(0,0,0,0);
 
-        if (!completedToday) {
-            habit.completedDates.push(new Date());
-            habit.streak += 1; // Simplistic streak logic
+        if (!progressDate || progressDate.getTime() !== today.getTime()) {
+            habit.dailyProgress = {
+                date: today,
+                completedBy: []
+            };
+        }
+
+        // Check if user already marked today
+        const userAlreadyCompleted = habit.dailyProgress.completedBy.some((id: any) => id.toString() === user.userId);
+        
+        if (!userAlreadyCompleted) {
+            habit.dailyProgress.completedBy.push(user.userId);
+            
+            // Calculate total members (Owner + SharedWith)
+            const totalMembers = 1 + habit.sharedWith.length;
+            
+            // If ALL members completed, increment streak and push to completedDates
+            if (habit.dailyProgress.completedBy.length >= totalMembers) {
+                habit.completedDates.push(new Date());
+                habit.streak += 1;
+            }
+            
             await habit.save();
 
-            // Update User Wins
+            // Update User Wins (Keep individual wins? Yes, individual effort counts)
             await User.findByIdAndUpdate(user.userId, { $inc: { wins: 1 } });
         }
       } else if (action === 'share') {

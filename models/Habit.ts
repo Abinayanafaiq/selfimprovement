@@ -26,6 +26,10 @@ const HabitSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   }],
+  dailyProgress: {
+    date: { type: Date },
+    completedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  },
   isArchived: {
     type: Boolean,
     default: false,
