@@ -20,14 +20,20 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const habit = await Habit.findOne({ _id: id })
         .populate('userId', 'username wins')
         .populate('sharedWith', 'username wins')
-        .populate('chat.sender', 'username');
+        .populate({ path: 'chat.sender', select: 'username', strictPopulate: false });
 
     if (!habit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
 
     // Check access
-    if (habit.userId._id.toString() !== user.userId && !habit.sharedWith.some((u: any) => u._id.toString() === user.userId)) {
+    const isOwner = habit.userId._id.toString() === user.userId;
+    const isShared = habit.sharedWith.some((u: any) => u._id.toString() === user.userId);
+    
+    console.log(`[GET Habit] ID: ${id}, User: ${user.userId}, Owner: ${habit.userId._id}, Shared: ${isShared}`);
+
+    if (!isOwner && !isShared) {
+        console.log('[GET Habit] Unauthorized access attempt');
         return NextResponse.json({ message: 'Unauthorized' }, { status: 403 });
     }
 
@@ -112,6 +118,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             // Calculate total members (Owner + SharedWith)
             const totalMembers = 1 + habit.sharedWith.length;
             
+            console.log(`[Complete] User: ${user.userId}, Completed: ${habit.dailyProgress.completedBy.length}/${totalMembers}`);
+
             // If ALL members completed, increment streak and push to completedDates
             if (habit.dailyProgress.completedBy.length >= totalMembers) {
                 habit.completedDates.push(new Date());
@@ -125,6 +133,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         }
       } else if (action === 'chat') {
           const { message } = body;
+          if (!habit.chat) habit.chat = [];
           habit.chat.push({
               sender: user.userId,
               message

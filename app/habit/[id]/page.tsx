@@ -53,10 +53,11 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
                 if (res.ok) {
                     setHabit(data.habit);
                 } else {
-                    router.push('/');
+                    console.log('Failed to fetch habit:', data);
+                    // router.push('/'); // Disable redirect for debugging
                 }
             } catch (err) {
-                console.error(err);
+                console.error('Error fetching habit:', err);
             } finally {
                 setLoading(false);
             }
@@ -147,11 +148,15 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
                 <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
                     {habit.chat && habit.chat.length > 0 ? (
                         habit.chat.map((msg: any, idx: number) => {
-                           const isMe = msg.sender._id === user.id;
+                           // Fallback if sender is null (deleted user)
+                           const senderId = msg.sender?._id || msg.sender; 
+                           const senderName = msg.sender?.username || 'Unknown';
+                           const isMe = senderId === user?.id;
+                           
                            return (
                                <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                    <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${isMe ? 'bg-indigo-500 text-white rounded-br-none' : 'bg-slate-100 text-slate-800 rounded-bl-none'}`}>
-                                       {!isMe && <p className="text-[10px] opacity-70 mb-1 font-bold">{msg.sender.username}</p>}
+                                       {!isMe && <p className="text-[10px] opacity-70 mb-1 font-bold">{senderName}</p>}
                                        <p>{msg.message}</p>
                                    </div>
                                </div>
