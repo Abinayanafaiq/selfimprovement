@@ -33,7 +33,9 @@ export async function GET(req: Request) {
             id: user._id, 
             username: user.username, 
             wins: user.wins,
-            dailyPlan: user.dailyPlan 
+            dailyPlan: user.dailyPlan,
+            avatarEmoji: user.avatarEmoji,
+            avatarColor: user.avatarColor
         } 
     }, { status: 200 });
 

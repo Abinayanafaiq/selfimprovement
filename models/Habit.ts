@@ -39,6 +39,20 @@ const HabitSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  timeCapsule: {
+    messages: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      text: { type: String, required: true },
+      createdAt: { type: Date, default: Date.now }
+    }],
+    unlockStreak: { type: Number, default: 30 }
+  },
+  billboard: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    text: { type: String, required: true, maxlength: 100 },
+    color: { type: String, default: 'yellow' },
+    createdAt: { type: Date, default: Date.now }
+  }]
 }, { timestamps: true });
 
 // Force recompilation in dev to catch schema changes

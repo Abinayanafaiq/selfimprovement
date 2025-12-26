@@ -18,9 +18,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
     await dbConnect();
     const habit = await Habit.findOne({ _id: id })
-        .populate('userId', 'username wins')
-        .populate('sharedWith', 'username wins')
-        .populate({ path: 'chat.sender', select: 'username', strictPopulate: false });
+        .populate('userId', 'username wins avatarEmoji avatarColor')
+        .populate('sharedWith', 'username wins avatarEmoji avatarColor')
+        .populate({ path: 'chat.sender', select: 'username avatarEmoji avatarColor', strictPopulate: false })
+        .populate({ path: 'billboard.userId', select: 'username avatarEmoji avatarColor', strictPopulate: false });
 
     if (!habit) {
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
@@ -177,6 +178,45 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
               habit.sharedWith.push(targetUser._id);
               await habit.save();
           }
+      } else if (action === 'capsule') {
+          const { text } = body;
+          if (!text) return NextResponse.json({ message: 'Text is required' }, { status: 400 });
+
+          if (!habit.timeCapsule) habit.timeCapsule = { messages: [], unlockStreak: 30 };
+          
+          // Check if user already has a message
+          const existingIndex = habit.timeCapsule.messages.findIndex((m: any) => m.userId.toString() === user.userId);
+          
+          if (existingIndex > -1) {
+              habit.timeCapsule.messages[existingIndex].text = text;
+              habit.timeCapsule.messages[existingIndex].createdAt = new Date();
+          } else {
+              habit.timeCapsule.messages.push({
+                  userId: user.userId,
+                  text,
+                  createdAt: new Date()
+              });
+          }
+          await habit.save();
+      } else if (action === 'billboard') {
+          const { text, color } = body;
+          if (!text) return NextResponse.json({ message: 'Text is required' }, { status: 400 });
+
+          if (!habit.billboard) habit.billboard = [];
+          
+          habit.billboard.push({
+              userId: user.userId,
+              text,
+              color: color || 'yellow',
+              createdAt: new Date()
+          });
+
+          // Keep only last 10 notes to keep board clean
+          if (habit.billboard.length > 10) {
+              habit.billboard = habit.billboard.slice(-10);
+          }
+
+          await habit.save();
       }
   
       return NextResponse.json({ habit });

@@ -9,8 +9,9 @@ interface HabitCardProps {
   currentUser: any;
 }
 
-export default function HabitCard({ habit, onUpdate, currentUser }: { habit: any, onUpdate: () => void, currentUser: any }) {
+export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardProps) {
   const [loading, setLoading] = useState(false);
+  const [showParticles, setShowParticles] = useState(false);
 
   // Check if completed today by THIS user
   const isCompletedToday = habit.dailyProgress?.completedBy?.includes(currentUser?._id) || false;
@@ -25,6 +26,8 @@ export default function HabitCard({ habit, onUpdate, currentUser }: { habit: any
         body: JSON.stringify({ action: 'complete' }),
       });
       if (res.ok) {
+        setShowParticles(true);
+        setTimeout(() => setShowParticles(false), 1000);
         onUpdate();
       }
     } catch (err) {
@@ -64,8 +67,26 @@ export default function HabitCard({ habit, onUpdate, currentUser }: { habit: any
   const isShared = habit.sharedWith && habit.sharedWith.length > 0;
 
   return (
-    <div className={`glass-panel p-6 flex flex-col justify-between h-full relative group hover:shadow-lg hover:-translate-y-1 transition-all border-2 ${isShared ? 'border-orange-100 bg-orange-50/20' : 'border-stone-100'}`}>
+    <div className={`glass-panel p-6 flex flex-col justify-between h-full relative group hover:shadow-lg hover:-translate-y-1 transition-all border-2 ${isShared ? 'border-orange-100 bg-orange-50/20' : 'border-stone-100'} ${showParticles ? 'completion-glow' : ''}`}>
       
+      {/* Particles */}
+      {showParticles && (
+        <div className="absolute inset-0 z-50 pointer-events-none">
+            {[...Array(12)].map((_, i) => (
+                <div 
+                    key={i} 
+                    className="particle w-2 h-2 rounded-full bg-emerald-400"
+                    style={{
+                        left: '50%',
+                        top: '50%',
+                        '--tw-translate-x': `${(Math.random() - 0.5) * 200}px`,
+                        '--tw-translate-y': `${(Math.random() - 0.5) * 200}px`,
+                    } as any}
+                />
+            ))}
+        </div>
+      )}
+
       {/* Header Row */}
       <div className="flex justify-between items-start mb-4">
           <div className="flex-1 pr-2">

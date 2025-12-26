@@ -24,6 +24,11 @@ body {
   border: 2px solid #F3F4F6;
   box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.05); /* Retro/Pop shadow */
   border-radius: 2rem; /* Super rounded */
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Liquid Spring */
+}
+.glass-panel:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.08);
 }
 
 /* Animated BG (Organic blob placeholder) */
@@ -64,7 +69,7 @@ input:focus {
     font-size: 16px;
 }
 .btn:active {
-    transform: scale(0.95);
+    transform: scale(0.92) translateY(2px); /* Liquid Squish */
 }
 
 .btn-primary {
@@ -108,4 +113,96 @@ input:focus {
 }
 .animate-fade-in {
     animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes team-glow {
+    0%, 100% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.7); }
+}
+.glow-team {
+    animation: team-glow 4s ease-in-out infinite;
+}
+
+@keyframes water-drop {
+    0% { transform: translateY(-10px) scale(0.5); opacity: 0; }
+    50% { transform: translateY(0) scale(1.2); opacity: 1; }
+    100% { transform: translateY(10px) scale(0.5); opacity: 0; }
+}
+.animate-water {
+    animation: water-drop 2s ease-in-out infinite;
+}
+
+/* Garden Grid */
+.garden-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    background-image: radial-gradient(#ebeae7 1px, transparent 1px);
+    background-size: 20px 20px;
+    border-radius: 1.5rem;
+}
+
+/* Premium UI Utilities */
+.bg-wood {
+  background-color: #d7b594;
+  background-image: 
+    linear-gradient(90deg, transparent 50%, rgba(255,255,255,.07) 50%),
+    linear-gradient(90deg, rgba(255,255,255,.13) 50%, transparent 50%),
+    linear-gradient(90deg, transparent 50%, rgba(255,255,255,.17) 50%),
+    linear-gradient(90deg, rgba(255,255,255,.19) 50%, transparent 50%);
+  background-size: 13px 200px, 23px 200px, 31px 200px, 37px 200px;
+}
+
+.sticky-cut {
+  clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
+}
+
+.sticky-shadow {
+  box-shadow: 
+    2px 2px 5px rgba(0,0,0,0.1),
+    10px 10px 15px rgba(0,0,0,0.05);
+}
+
+.font-handwriting {
+  font-family: var(--font-handwriting), cursive;
+}
+
+.animate-confetti {
+  animation: confetti 1s ease-out forwards;
+}
+
+@keyframes confetti {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Completion Explosion */
+.completion-glow {
+  animation: completion-glow 0.8s ease-out;
+}
+
+@keyframes completion-glow {
+  0% { box-shadow: 0 0 0 0px rgba(74, 222, 128, 0.6); }
+  100% { box-shadow: 0 0 40px 20px rgba(74, 222, 128, 0); }
+}
+
+.particle {
+  position: absolute;
+  pointer-events: none;
+  animation: particle-pop 0.6s ease-out forwards;
+}
+
+@keyframes particle-pop {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) scale(0); opacity: 0; }
 }

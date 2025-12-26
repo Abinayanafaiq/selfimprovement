@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import HabitCard from '@/components/HabitCard';
+import GardenPlot from '@/components/GardenPlot';
+import DynamicSky from '@/components/DynamicSky';
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
@@ -86,6 +88,10 @@ export default function Home() {
     <main className="min-h-screen p-4 sm:p-8 max-w-7xl mx-auto pb-32">
       <Navbar user={user} />
 
+      <div className="mb-8 animate-fade-in">
+        <DynamicSky />
+      </div>
+
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-fade-in">
         <div className="glass-panel p-6 bg-blue-50/50 border-blue-100">
@@ -94,42 +100,21 @@ export default function Home() {
         </div>
         
         {/* Zen Garden Card */}
-        <div className="glass-panel p-6 bg-emerald-50/50 border-emerald-100 relative overflow-hidden">
-            <h2 className="text-sm font-black text-emerald-600 uppercase tracking-wider mb-3 z-10 relative">My Zen Garden 🌻</h2>
+        <div className="glass-panel p-6 bg-emerald-50/50 border-emerald-100 relative overflow-hidden md:col-span-1">
+            <h2 className="text-sm font-black text-emerald-600 uppercase tracking-wider mb-2 z-10 relative">Garden of Streaks 🌺</h2>
             
             {habits.length === 0 ? (
                 <div className="text-center text-emerald-400 mt-4 text-xs font-bold">Plant a habit to start!</div>
             ) : (
-                <div className="grid grid-cols-4 gap-2 z-10 relative">
-                    {habits.map((h: any, i: number) => {
-                        // Determine Plant Stage based on Streak
-                        let plant = '🌱'; // Default Sprout
-                        if (h.streak >= 30) plant = '🌳'; // Mighty Tree
-                        else if (h.streak >= 14) plant = '🌷'; // Tulip
-                        else if (h.streak >= 7) plant = '🌻'; // Sunflower
-                        else if (h.streak >= 3) plant = '🌿'; // Herb
-                        else if (h.streak === 0) plant = '🌰'; // Seed
-
-                        // Check if watered (completed today)
-                        // Note: completedDates stores strings or Date objects. Simplified check:
-                        const lastCompleted = h.completedDates?.length > 0 ? new Date(h.completedDates[h.completedDates.length - 1]).toDateString() : '';
-                        const today = new Date().toDateString();
-                        const isWatered = lastCompleted === today;
-
-                        return (
-                            <div key={i} className="flex flex-col items-center group relative cursor-help" title={`${h.title}: ${h.streak} day streak`}>
-                                <div className={`text-2xl transition-all duration-500 ${isWatered ? 'scale-110 drop-shadow-md animate-bounce' : 'opacity-60 grayscale-[50%] scale-90'}`} style={{ animationDuration: '2s' }}>
-                                    {plant}
-                                </div>
-                                {!isWatered && <div className="absolute -top-1 -right-1 text-[8px] animate-pulse">💧</div>}
-                            </div>
-                        )
-                    })}
+                <div className="garden-grid z-10 relative min-h-[140px] flex items-center justify-center flex-wrap">
+                    {habits.map((h: any) => (
+                        <GardenPlot key={h._id} habit={h} />
+                    ))}
                 </div>
             )}
             
-            {/* Background Decoration */}
-            <div className="absolute bottom-0 left-0 w-full h-8 bg-emerald-100/30 skew-y-3"></div>
+            {/* Ground Decoration */}
+            <div className="absolute bottom-0 left-0 w-full h-8 bg-stone-200/20 skew-y-1"></div>
         </div>
 
         {/* Mascot Evolution Card */}

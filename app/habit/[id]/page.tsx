@@ -4,6 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
+import GardenPlot from '@/components/GardenPlot';
+import DuoMascot from '@/components/DuoMascot';
+import TimeCapsule from '@/components/TimeCapsule';
+import DailyBillboard from '@/components/DailyBillboard';
+
+import ProgressMap from '@/components/ProgressMap';
 
 export default function HabitRoom({ params }: { params: Promise<{ id: string }> }) {
   const [habit, setHabit] = useState<any>(null);
@@ -11,7 +17,6 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
   const [user, setUser] = useState<any>(null);
   const [newMessage, setNewMessage] = useState('');
   const router = useRouter();
-
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
@@ -54,7 +59,6 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
                     setHabit(data.habit);
                 } else {
                     console.log('Failed to fetch habit:', data);
-                    // router.push('/'); // Disable redirect for debugging
                 }
             } catch (err) {
                 console.error('Error fetching habit:', err);
@@ -71,34 +75,54 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
     return <div className="min-h-screen flex items-center justify-center text-slate-500">Loading Room...</div>;
   }
 
-  const members = [habit.userId, ...habit.sharedWith];
+  const members = habit ? [habit.userId, ...habit.sharedWith] : [];
+  const partner = members.find((m: any) => m._id.toString() !== user?.id?.toString());
 
   return (
     <main className="min-h-screen p-4 sm:p-8 max-w-5xl mx-auto">
       <Navbar user={user} />
       
-      <div className="mb-8 animate-fade-in">
-        <Link href="/" className="inline-flex items-center text-slate-500 hover:text-primary mb-4 transition-colors">
-            ← Back to Dashboard
+      <div className="mb-8 animate-fade-in space-y-8">
+        <Link href="/" className="group inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-stone-100 rounded-2xl text-stone-500 font-bold hover:border-green-400 hover:text-green-600 transition-all shadow-sm hover:shadow-md active:scale-95">
+            <span className="transition-transform group-hover:-translate-x-1">←</span>
+            Back to Dashboard
         </Link>
         
-        <div className="glass-panel p-8 relative overflow-hidden">
+        {/* Progress Map Section (NEW) */}
+        <ProgressMap 
+            streak={habit.streak} 
+            user={user} 
+            partner={partner} 
+        />
+
+        <div className="glass-panel p-8 relative overflow-hidden bg-white/40">
             {/* Background Decoration */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
 
             <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div>
-                    <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-wide mb-2">
-                        Team Room
+                <div className="flex-1">
+                    <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-2">
+                        Squad HQ
                     </span>
-                    <h1 className="text-4xl font-bold text-slate-900 mb-2">{habit.title}</h1>
-                    <p className="text-slate-500 text-lg">{habit.description || 'No description provided.'}</p>
+                    <h1 className="text-4xl font-black text-slate-900 mb-2 tracking-tight">{habit.title}</h1>
+                    <p className="text-slate-500 text-lg mb-4 font-medium">{habit.description || 'No description provided.'}</p>
+                    
+                    {/* Habit Growth Visualization */}
+                    <div className="inline-flex items-center gap-4 p-4 bg-stone-100/30 rounded-3xl border border-stone-100/50 backdrop-blur-sm">
+                        <div className="w-16 h-16 flex items-center justify-center bg-white/50 rounded-2xl shadow-sm border border-stone-100">
+                            <GardenPlot habit={habit} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Team Growth</p>
+                            <p className="text-sm font-bold text-stone-600">The forest is thriving!</p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div className="text-center md:text-right bg-white/50 p-4 rounded-2xl border border-indigo-100">
-                    <p className="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-1">Current Streak</p>
-                    <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
-                        {habit.streak} <span className="text-3xl">🔥</span>
+                <div className="text-center md:text-right bg-white p-6 rounded-[2.5rem] border-4 border-indigo-50 shadow-xl min-w-[160px]">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-1">Current Streak</p>
+                    <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center md:justify-end gap-2">
+                        {habit.streak} <span className="text-4xl">🔥</span>
                     </div>
                 </div>
             </div>
@@ -106,31 +130,55 @@ export default function HabitRoom({ params }: { params: Promise<{ id: string }> 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Members Section */}
-        <div className="glass-panel p-8 animate-fade-in border-stone-100" style={{ animationDelay: '0.1s' }}>
-            <h2 className="text-xl font-black text-stone-800 mb-6 flex items-center gap-2">
-                👥 Squad Members
-            </h2>
-            <div className="space-y-4">
-                {members.map((m: any, idx: number) => (
-                    <div key={m._id} className="flex items-center justify-between p-4 rounded-2xl bg-stone-50 border-2 border-stone-100">
-                        <div className="flex items-center gap-3">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-xl shadow-inner ${['bg-green-400', 'bg-orange-400', 'bg-yellow-400'][idx % 3]}`}>
-                                {m.username[0].toUpperCase()}
+        {/* Members & Mascot Section */}
+        <div className="space-y-6">
+            <div className="glass-panel p-8 animate-fade-in border-stone-100" style={{ animationDelay: '0.1s' }}>
+                <h2 className="text-xl font-black text-stone-800 mb-6 flex items-center gap-2">
+                    👥 Squad Members
+                </h2>
+                <div className="space-y-4">
+                    {members.map((m: any, idx: number) => (
+                        <div key={m._id} className="flex items-center justify-between p-4 rounded-2xl bg-stone-50 border-2 border-stone-100 transition-all hover:scale-[1.02]">
+                            <div className="flex items-center gap-3">
+                                <div 
+                                    className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-lg border-4 border-white`}
+                                    style={{ backgroundColor: m.avatarColor || '#E2E8F0' }}
+                                >
+                                    {m.avatarEmoji || m.username[0].toUpperCase()}
+                                </div>
+                                <div>
+                                    <p className="font-black text-stone-800 text-lg tracking-tight">{m.username}</p>
+                                    <p className="text-[10px] text-stone-400 font-black uppercase tracking-widest">Lvl. {Math.floor((m.wins || 0) / 10) + 1} Spirit</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="font-bold text-stone-800 text-lg">{m.username}</p>
-                                <p className="text-xs text-stone-400 font-bold uppercase tracking-wider">Lvl. {Math.floor((m.wins || 0) / 5) + 1} Sprout</p>
-                            </div>
+                            {m._id === habit.userId._id && (
+                                <span className="text-[10px] font-black text-orange-600 bg-orange-100 px-3 py-1 rounded-full border border-orange-200 uppercase tracking-widest">Leader</span>
+                            )}
                         </div>
-                        {m._id === habit.userId._id && (
-                            <span className="text-[10px] font-black text-orange-600 bg-orange-100 px-3 py-1 rounded-full border border-orange-200 uppercase tracking-widest">Leader</span>
-                        )}
-                    </div>
-                ))}
+                    ))}
+                </div>
+            </div>
+
+            {/* Duo Mascot Section */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
+                <DuoMascot habit={habit} members={members} />
+            </div>
+
+            {/* Time Capsule Section */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <TimeCapsule habit={habit} currentUser={user} onUpdate={() => {
+                     fetch(`/api/habits/${habit._id}`).then(r => r.json()).then(data => setHabit(data.habit));
+                }} />
+            </div>
+
+            {/* Daily Billboard Section */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.25s' }}>
+                <DailyBillboard habit={habit} currentUser={user} onUpdate={() => {
+                     fetch(`/api/habits/${habit._id}`).then(r => r.json()).then(data => setHabit(data.habit));
+                }} />
             </div>
             
-            <div className="mt-6 p-6 bg-yellow-50/50 rounded-3xl border-2 border-yellow-100 text-center relative overflow-hidden">
+            <div className="p-6 bg-yellow-50/50 rounded-3xl border-2 border-yellow-100 text-center relative overflow-hidden">
                  <div className="absolute -left-4 -top-4 text-6xl opacity-10 rotate-12">❝</div>
                 <p className="text-sm text-yellow-800 font-bold italic relative z-10">
                     "Alone we go faster, together we go further."
