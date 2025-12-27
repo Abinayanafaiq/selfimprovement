@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import HabitCard from '@/components/HabitCard';
 import GardenPlot from '@/components/GardenPlot';
 import DynamicSky from '@/components/DynamicSky';
+import DailyMastery from '@/components/DailyMastery';
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
@@ -92,6 +93,11 @@ export default function Home() {
         <DynamicSky />
       </div>
 
+      {/* Daily Mastery Indicator */}
+      {user && habits.length > 0 && (
+        <DailyMastery habits={habits} user={user} onUpdate={fetchData} />
+      )}
+
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-fade-in">
         <div className="glass-panel p-6 bg-blue-50/50 border-blue-100">
@@ -171,43 +177,49 @@ export default function Home() {
           </h2>
 
           <div className="flex flex-col gap-3 relative z-10">
-              {user?.dailyPlan?.map((task: any) => (
-                  <div key={task._id} className="flex items-center gap-3 group">
-                      <button 
-                          onClick={async () => {
-                              // Toggle Local State optimistically
-                              const newPlan = user.dailyPlan.map((t: any) => t._id === task._id ? {...t, completed: !t.completed} : t);
-                              setUser({...user, dailyPlan: newPlan});
-                              
-                              // API Call
-                              await fetch('/api/dailyplan', {
-                                  method: 'PUT',
-                                  body: JSON.stringify({ taskId: task._id })
-                              });
-                          }}
-                          className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-green-500 border-green-500' : 'border-stone-300 hover:border-stone-400'}`}
-                      >
-                          {task.completed && <span className="text-white font-bold text-xs">✓</span>}
-                      </button>
-                      <span className={`text-lg font-bold transition-all ${task.completed ? 'text-stone-300 line-through' : 'text-stone-700'}`}>
-                          {task.text}
-                      </span>
-                      <button 
-                          onClick={async () => {
-                              const newPlan = user.dailyPlan.filter((t: any) => t._id !== task._id);
-                              setUser({...user, dailyPlan: newPlan});
-                              await fetch('/api/dailyplan', { method: 'DELETE', body: JSON.stringify({ taskId: task._id })});
-                          }}
-                          className="opacity-0 group-hover:opacity-100 ml-auto text-red-300 hover:text-red-500 font-bold px-2"
-                      >
-                          ×
-                      </button>
-                  </div>
-              ))}
-              
-              {(!user?.dailyPlan || user.dailyPlan.length === 0) && (
-                  <div className="text-stone-400 italic">No tasks for today. Add one below!</div>
-              )}
+              {(() => {
+                  const today = new Date();
+                  today.setHours(0,0,0,0);
+                  const todaysTasks = user?.dailyPlan?.filter((t: any) => new Date(t.createdAt).setHours(0,0,0,0) >= today.getTime()) || [];
+                  
+                  if (todaysTasks.length === 0) {
+                      return <div className="text-stone-400 italic">No tasks for today. Add one below!</div>;
+                  }
+
+                  return todaysTasks.map((task: any) => (
+                      <div key={task._id} className="flex items-center gap-3 group">
+                          <button 
+                              onClick={async () => {
+                                  // Toggle Local State optimistically
+                                  const newPlan = user.dailyPlan.map((t: any) => t._id === task._id ? {...t, completed: !t.completed} : t);
+                                  setUser({...user, dailyPlan: newPlan});
+                                  
+                                  // API Call
+                                  await fetch('/api/dailyplan', {
+                                      method: 'PUT',
+                                      body: JSON.stringify({ taskId: task._id })
+                                  });
+                              }}
+                              className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-green-500 border-green-500' : 'border-stone-300 hover:border-stone-400'}`}
+                          >
+                              {task.completed && <span className="text-white font-bold text-xs">✓</span>}
+                          </button>
+                          <span className={`text-lg font-bold transition-all ${task.completed ? 'text-stone-300 line-through' : 'text-stone-700'}`}>
+                              {task.text}
+                          </span>
+                          <button 
+                              onClick={async () => {
+                                  const newPlan = user.dailyPlan.filter((t: any) => t._id !== task._id);
+                                  setUser({...user, dailyPlan: newPlan});
+                                  await fetch('/api/dailyplan', { method: 'DELETE', body: JSON.stringify({ taskId: task._id })});
+                              }}
+                              className="opacity-0 group-hover:opacity-100 ml-auto text-red-300 hover:text-red-500 font-bold px-2"
+                          >
+                              ×
+                          </button>
+                      </div>
+                  ));
+              })()}
 
               <form 
                   onSubmit={async (e) => {
@@ -229,8 +241,15 @@ export default function Home() {
                   className="mt-4 flex gap-2"
               >
                   <input 
+                      id="daily-plan-input"
                       name="taskInput"
-                      placeholder="Add task..." 
+                      placeholder={(() => {
+                          const today = new Date().setHours(0,0,0,0);
+                          const todaysTasks = user?.dailyPlan?.filter((t: any) => new Date(t.createdAt).setHours(0,0,0,0) >= today) || [];
+                          const habitsDone = habits.every(h => h.dailyProgress?.completedBy?.includes(user?.id || user?._id));
+                          const tasksDone = todaysTasks.length > 0 && todaysTasks.every((t: any) => t.completed);
+                          return (habitsDone && (todaysTasks.length === 0 || tasksDone)) ? "What's the plan for tomorrow?" : "Add task for today...";
+                      })()}
                       className="flex-1 bg-white/50 border-2 border-stone-200 rounded-xl focus:border-stone-400 focus:bg-white outline-none p-3 font-bold text-stone-600 placeholder-stone-300 transition-colors"
                   />
                   <button 

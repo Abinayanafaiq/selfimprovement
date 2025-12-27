@@ -14,7 +14,8 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
   const [showParticles, setShowParticles] = useState(false);
 
   // Check if completed today by THIS user
-  const isCompletedToday = habit.dailyProgress?.completedBy?.includes(currentUser?._id) || false;
+  const currentUserId = currentUser?.id || currentUser?._id;
+  const isCompletedToday = habit.dailyProgress?.completedBy?.includes(currentUserId) || false;
 
   const completeHabit = async () => {
     if (loading || isCompletedToday) return;
