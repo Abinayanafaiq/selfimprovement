@@ -18,7 +18,7 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
   const isCompletedToday = habit.dailyProgress?.completedBy?.includes(currentUserId) || false;
 
   const completeHabit = async () => {
-    if (loading || isCompletedToday) return;
+    if (loading) return;
     setLoading(true);
     try {
       const res = await fetch(`/api/habits/${habit._id}`, {
@@ -27,8 +27,10 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
         body: JSON.stringify({ action: 'complete' }),
       });
       if (res.ok) {
-        setShowParticles(true);
-        setTimeout(() => setShowParticles(false), 1000);
+        if (!isCompletedToday) {
+            setShowParticles(true);
+            setTimeout(() => setShowParticles(false), 1000);
+        }
         onUpdate();
       }
     } catch (err) {
