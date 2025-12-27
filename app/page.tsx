@@ -46,6 +46,10 @@ export default function Home() {
 
   useEffect(() => {
     fetchData();
+    
+    // Add polling for team updates
+    const interval = setInterval(fetchData, 10000); // 10 seconds
+    return () => clearInterval(interval);
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {

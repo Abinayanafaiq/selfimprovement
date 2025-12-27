@@ -68,6 +68,13 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
   }
 
   const isShared = habit.sharedWith && habit.sharedWith.length > 0;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const totalMembers = 1 + (habit.sharedWith?.length || 0);
+  
+  const isTeamCompleteToday = habit.completedDates?.some((d: any) => {
+    const dateStr = typeof d === 'string' ? d : new Date(d).toISOString().split('T')[0];
+    return dateStr === todayStr;
+  }) || (habit.dailyProgress?.completedBy?.length >= totalMembers);
 
   return (
     <div className={`glass-panel p-6 flex flex-col justify-between h-full relative group hover:shadow-lg hover:-translate-y-1 transition-all border-2 ${isShared ? 'border-orange-100 bg-orange-50/20' : 'border-stone-100'} ${showParticles ? 'completion-glow' : ''}`}>
@@ -123,6 +130,11 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
       <div className="mt-auto pt-4 border-t-2 border-dashed border-stone-100/50">
         <div className="flex justify-between items-center mb-3 text-xs font-bold tracking-wide">
             <span className="text-stone-400">{isShared ? 'TEAM STREAK' : 'STREAK'}</span>
+            {isShared && (
+                <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-[10px] ml-auto mr-2">
+                    {habit.dailyProgress?.completedBy?.length || 0}/{(1 + (habit.sharedWith?.length || 0))} DONE
+                </span>
+            )}
             <span className={`text-xl ${isShared ? 'text-orange-500' : 'text-emerald-500'} flex items-center gap-1`}>
                 {habit.streak} <span className="text-lg">🔥</span>
             </span>
@@ -133,19 +145,19 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
           disabled={loading}
           className={`w-full py-3 rounded-xl font-black text-sm uppercase tracking-wide transition-all active:scale-95 shadow-lg ${
             isCompletedToday 
-            ? (isShared && !habit.completedDates.includes(new Date().toISOString().split('T')[0]) 
+            ? (isShared && !isTeamCompleteToday 
                 ? 'bg-yellow-400 text-yellow-900 shadow-yellow-200 animate-pulse hover:bg-yellow-500' // Waiting State
                 : 'bg-emerald-100 text-emerald-600 border-2 border-emerald-200 shadow-none hover:bg-red-50 hover:text-red-500 hover:border-red-200') // Completed State (Hover to Undo)
             : 'bg-emerald-500 text-white shadow-emerald-200 hover:bg-emerald-600 hover:shadow-emerald-300'
           }`}
         >
           {loading ? '...' : isCompletedToday ? (
-              isShared && !habit.completedDates.includes(new Date().toISOString().split('T')[0]) 
+              isShared && !isTeamCompleteToday 
               ? '⏳ Waiting for Team (Tap to Undo)' 
               : <span className="group-hover:hidden">Completed! 🎉</span>
           ) : 'Mark Complete'}
           {isCompletedToday && !loading && (
-             isShared && !habit.completedDates.includes(new Date().toISOString().split('T')[0]) ? null : <span className="hidden group-hover:inline">Undo Completion?</span>
+             isShared && !isTeamCompleteToday ? null : <span className="hidden group-hover:inline">Undo Completion?</span>
           )}
         </button>
         

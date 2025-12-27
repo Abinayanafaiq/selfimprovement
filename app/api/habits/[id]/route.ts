@@ -96,14 +96,19 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       }
   
       if (action === 'complete') {
+        // Calculate unique total members
+        const uniqueMembers = new Set([habit.userId.toString(), ...habit.sharedWith.map((id: any) => id.toString())]);
+        const totalMembers = uniqueMembers.size;
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+        const todayIso = today.toISOString().split('T')[0];
 
         // Initialize or Reset Daily Progress if new day
-        const progressDate = habit.dailyProgress?.date ? new Date(habit.dailyProgress.date) : null;
-        if (progressDate) progressDate.setHours(0,0,0,0);
+        const progressDate = habit.dailyProgress?.date ? new Date(habit.dailyProgress.date).toISOString().split('T')[0] : null;
 
-        if (!progressDate || progressDate.getTime() !== today.getTime()) {
+        if (!progressDate || progressDate !== todayIso) {
+            console.log(`[Reset] Daily progress reset for ${habit._id}. Old: ${progressDate}, New: ${todayIso}`);
             habit.dailyProgress = {
                 date: today,
                 completedBy: []
@@ -117,39 +122,40 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             // UNMARK / UNDO
             habit.dailyProgress.completedBy = habit.dailyProgress.completedBy.filter((id: any) => id.toString() !== user.userId);
             
-            // Check if this habit WAS completed today by everyone, and now it isn't
-            // Logic: If completedDates includes today, remove it and decrement streak
-            // Note: completedDates are Dates or Strings. Comparison needed.
-            const todayStr = new Date().toDateString();
-            const wasOfficialComplete = habit.completedDates.some((d: any) => new Date(d).toDateString() === todayStr);
-
-            if (wasOfficialComplete) {
-                // Remove today from completedDates
-                habit.completedDates = habit.completedDates.filter((d: any) => new Date(d).toDateString() !== todayStr);
-                habit.streak = Math.max(0, habit.streak - 1);
-            }
+            // Remove today from completedDates
+            habit.completedDates = habit.completedDates.filter((d: any) => {
+                const dateStr = typeof d === 'string' ? d : new Date(d).toISOString().split('T')[0];
+                return dateStr !== todayIso;
+            });
+            
+            // Recalculate streak more safely (optional but better)
+            // For now just decrement if it was pushed
+            if (habit.streak > 0) habit.streak -= 1;
 
             await habit.save();
             await User.findByIdAndUpdate(user.userId, { $inc: { wins: -1 } });
-             console.log(`[Undo] User: ${user.userId} undid completion.`);
+            console.log(`[Undo] User: ${user.userId} undid completion for ${habit._id}. Progress now: ${habit.dailyProgress.completedBy.length}/${totalMembers}`);
         } else {
             // MARK COMPLETE
             habit.dailyProgress.completedBy.push(user.userId);
             
-            // Calculate total members (Owner + SharedWith)
-            const totalMembers = 1 + habit.sharedWith.length;
-            
-            console.log(`[Complete] User: ${user.userId}, Completed: ${habit.dailyProgress.completedBy.length}/${totalMembers}`);
+            console.log(`[Complete] User: ${user.userId} marked ${habit._id}. Progress: ${habit.dailyProgress.completedBy.length}/${totalMembers}`);
 
             // If ALL members completed, increment streak and push to completedDates
             if (habit.dailyProgress.completedBy.length >= totalMembers) {
-                habit.completedDates.push(new Date());
-                habit.streak += 1;
+                const alreadyRecorded = habit.completedDates.some((d: any) => {
+                    const dateStr = typeof d === 'string' ? d : new Date(d).toISOString().split('T')[0];
+                    return dateStr === todayIso;
+                });
+
+                if (!alreadyRecorded) {
+                    console.log(`[Complete] Team fully completed ${habit._id}! Pushing date ${todayIso}`);
+                    habit.completedDates.push(todayIso);
+                    habit.streak += 1;
+                }
             }
             
             await habit.save();
-
-            // Update User Wins (Keep individual wins? Yes, individual effort counts)
             await User.findByIdAndUpdate(user.userId, { $inc: { wins: 1 } });
         }
       } else if (action === 'chat') {
