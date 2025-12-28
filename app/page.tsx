@@ -7,6 +7,7 @@ import HabitCard from '@/components/HabitCard';
 import GardenPlot from '@/components/GardenPlot';
 import DynamicSky from '@/components/DynamicSky';
 import DailyMastery from '@/components/DailyMastery';
+import DailyCalendar from '@/components/DailyCalendar';
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
@@ -159,17 +160,26 @@ export default function Home() {
                             <div className={`h-full ${mascot.color} transition-all duration-1000`} style={{ width: `${progress}%` }}></div>
                         </div>
                         <p className="text-[10px] text-stone-400 font-bold">{wins} / {mascot.next} Wins to Evolve</p>
-
-                        <button 
-                            onClick={() => setShowForm(!showForm)}
-                            className="btn btn-primary w-full mt-4 z-10 text-sm py-2"
-                        >
-                            {showForm ? 'Cancel' : '+ New Habit'}
-                        </button>
                     </>
                 );
             })()}
         </div>
+
+        {/* Calendar Card */}
+        {user && (
+            <div className="md:col-span-1">
+                <DailyCalendar completedDays={user.completedDays || []} />
+            </div>
+        )}
+      </div>
+
+      <div className="mb-12 flex justify-end">
+          <button 
+                onClick={() => setShowForm(!showForm)}
+                className="btn btn-primary px-8 py-3 text-sm shadow-xl shadow-green-200"
+            >
+                {showForm ? 'Cancel' : '+ Create New Habit'}
+            </button>
       </div>
       
       {/* Daily Plan Widget */}

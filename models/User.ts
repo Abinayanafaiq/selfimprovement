@@ -25,6 +25,7 @@ const UserSchema = new mongoose.Schema({
   // For caching simple analytics
   totalHabits: { type: Number, default: 0 },
   wins: { type: Number, default: 0 }, // Total completions
+  completedDays: [{ type: Date }], // Dates user secured a daily win
   avatarEmoji: { type: String, default: '🍃' },
   avatarColor: { type: String, default: '#4ADE80' },
 }, { timestamps: true });

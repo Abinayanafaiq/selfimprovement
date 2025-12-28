@@ -34,6 +34,7 @@ export async function GET(req: Request) {
             username: user.username, 
             wins: user.wins,
             dailyPlan: user.dailyPlan,
+            completedDays: user.completedDays,
             avatarEmoji: user.avatarEmoji,
             avatarColor: user.avatarColor
         } 

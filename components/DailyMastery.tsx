@@ -30,9 +30,17 @@ export default function DailyMastery({ habits, user, onUpdate }: DailyMasteryPro
 
     const isFullyComplete = overallProgress === 100 && (totalHabits > 0 || dailyTasks.length > 0);
 
-    const handleMarkDayDone = () => {
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 2000);
+    const handleMarkDayDone = async () => {
+        try {
+            const res = await fetch('/api/user/win', { method: 'POST' });
+            if (res.ok) {
+                setShowConfetti(true);
+                setTimeout(() => setShowConfetti(false), 2000);
+                onUpdate(); // Refetch user data to update wins and completedDays
+            }
+        } catch (error) {
+            console.error('Error securing win:', error);
+        }
     };
 
     return (
