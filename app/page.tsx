@@ -8,6 +8,7 @@ import GardenPlot from '@/components/GardenPlot';
 import DynamicSky from '@/components/DynamicSky';
 import DailyMastery from '@/components/DailyMastery';
 import DailyCalendar from '@/components/DailyCalendar';
+import MotivationalQuotes from '@/components/MotivationalQuotes';
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
@@ -104,6 +105,10 @@ export default function Home() {
       )}
 
       {/* Hero Stats */}
+      <div className="mb-8 animate-fade-in">
+        <MotivationalQuotes />
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-fade-in">
         <div className="glass-panel p-6 bg-blue-50/50 border-blue-100">
             <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wider mb-1">Monthly Winrate</h2>
