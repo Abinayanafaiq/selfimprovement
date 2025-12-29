@@ -27,6 +27,21 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ message: 'Habit not found' }, { status: 404 });
     }
 
+    // PROACTIVE RESET: If date is not today, reset it
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayIso = today.toISOString().split('T')[0];
+    const progressDate = habit.dailyProgress?.date ? new Date(habit.dailyProgress.date).toISOString().split('T')[0] : null;
+
+    if (!progressDate || progressDate !== todayIso) {
+        console.log(`[Proactive Reset Single] Resetting habit ${habit._id} for new day ${todayIso}`);
+        habit.dailyProgress = {
+            date: today,
+            completedBy: []
+        };
+        await habit.save();
+    }
+
     // Check access
     const isOwner = habit.userId._id.toString() === user.userId;
     const isShared = habit.sharedWith.some((u: any) => u._id.toString() === user.userId);

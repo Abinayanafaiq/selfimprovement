@@ -15,7 +15,9 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
 
   // Check if completed today by THIS user
   const currentUserId = currentUser?.id || currentUser?._id;
-  const isCompletedToday = habit.dailyProgress?.completedBy?.includes(currentUserId) || false;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const progressDate = habit.dailyProgress?.date ? new Date(habit.dailyProgress.date).toISOString().split('T')[0] : null;
+  const isCompletedToday = (progressDate === todayStr) && (habit.dailyProgress?.completedBy?.includes(currentUserId) || false);
 
   const completeHabit = async () => {
     if (loading) return;
@@ -68,13 +70,14 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
   }
 
   const isShared = habit.sharedWith && habit.sharedWith.length > 0;
-  const todayStr = new Date().toISOString().split('T')[0];
   const totalMembers = 1 + (habit.sharedWith?.length || 0);
   
-  const isTeamCompleteToday = habit.completedDates?.some((d: any) => {
-    const dateStr = typeof d === 'string' ? d : new Date(d).toISOString().split('T')[0];
-    return dateStr === todayStr;
-  }) || (habit.dailyProgress?.completedBy?.length >= totalMembers);
+  const isTeamCompleteToday = (progressDate === todayStr) && (
+    habit.completedDates?.some((d: any) => {
+        const dateStr = typeof d === 'string' ? d : new Date(d).toISOString().split('T')[0];
+        return dateStr === todayStr;
+    }) || (habit.dailyProgress?.completedBy?.length >= totalMembers)
+  );
 
   return (
     <div className={`glass-panel p-6 flex flex-col justify-between h-full relative group hover:shadow-lg hover:-translate-y-1 transition-all border-2 ${isShared ? 'border-orange-100 bg-orange-50/20' : 'border-stone-100'} ${showParticles ? 'completion-glow' : ''}`}>
@@ -132,7 +135,7 @@ export default function HabitCard({ habit, onUpdate, currentUser }: HabitCardPro
             <span className="text-stone-400">{isShared ? 'TEAM STREAK' : 'STREAK'}</span>
             {isShared && (
                 <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-[10px] ml-auto mr-2">
-                    {habit.dailyProgress?.completedBy?.length || 0}/{(1 + (habit.sharedWith?.length || 0))} DONE
+                    {(progressDate === todayStr ? habit.dailyProgress?.completedBy?.length : 0)}/{(1 + (habit.sharedWith?.length || 0))} DONE
                 </span>
             )}
             <span className={`text-xl ${isShared ? 'text-orange-500' : 'text-emerald-500'} flex items-center gap-1`}>

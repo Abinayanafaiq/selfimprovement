@@ -24,6 +24,25 @@ export async function GET(req: Request) {
       ]
     }).sort({ createdAt: -1 });
 
+    // PROACTIVE RESET: Check if any habit needs a daily reset
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayIso = today.toISOString().split('T')[0];
+
+    let hasChanges = false;
+    for (const habit of habits) {
+        const progressDate = habit.dailyProgress?.date ? new Date(habit.dailyProgress.date).toISOString().split('T')[0] : null;
+        if (!progressDate || progressDate !== todayIso) {
+            console.log(`[Proactive Reset] Resetting habit ${habit._id} for new day ${todayIso}`);
+            habit.dailyProgress = {
+                date: today,
+                completedBy: []
+            };
+            await habit.save();
+            hasChanges = true;
+        }
+    }
+
     return NextResponse.json({ habits });
   } catch (error) {
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
